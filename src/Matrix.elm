@@ -1,5 +1,6 @@
 module Matrix exposing (..)
 
+import Round exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (class, scope, style, title)
 import Color exposing (white)
@@ -101,6 +102,8 @@ matrixTableRow palette =
       let
         ratio : Float
         ratio = contrastRatio background.color foreground.color
+        ratioStr : String
+        ratioStr = toString ratio
 
         validCell : Html msg
         validCell =
@@ -112,7 +115,32 @@ matrixTableRow palette =
                 [ strong [ class "usa-sr-invisible"
                          , ariaHidden True
                          , style [("color", paletteEntryHex foreground)] ]
-                    [ text "Aa" ]
+                    [ text "3.0" ]
+                ]
+            , div [ class "usa-matrix-color-combo-description" ]
+              [ strong [] [ text (capFirst foreground.name) ]
+              , text " text on "
+              , strong [] [ text (capFirst background.name) ]
+              , text " background"
+              , span [ class "usa-sr-only" ]
+                [ text " is 508-compliant, with a contrast ratio of "
+                , text (humanFriendlyContrastRatio ratio)
+                , text "."
+                ]
+              ]
+            ]
+
+        validCellAa : Html msg
+        validCellAa =
+          td [ class "usa-matrix-valid-color-combo" ]
+            [ div [ class "usa-matrix-square"
+                  , style (squareBgStyle background)
+                  , title (goodContrastText background foreground ratio)
+                  , role "presentation" ]
+                [ strong [ class "usa-sr-invisible"
+                         , ariaHidden True
+                         , style [("color", paletteEntryHex foreground)] ]
+                    [ text "4.5" ]
                 ]
             , div [ class "usa-matrix-color-combo-description" ]
               [ strong [] [ text (capFirst foreground.name) ]
@@ -138,7 +166,7 @@ matrixTableRow palette =
               , div [ class "usa-sr-only" ] [ text desc ]
               ]
       in
-        if ratio >= 4.5 then validCell else invalidCell
+        if ratio >= 4.5 then validCellAa else if ratio >= 3.0 then validCell else invalidCell
 
     row : Palette -> PaletteEntry -> Html msg
     row palette background =
